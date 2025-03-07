@@ -1,26 +1,21 @@
 # Whisper GUI
 This tool is based on the OpenAI transcription tool (https://github.com/openai/whisper). This repo is an easy set up process for people who are not familiar with python and libraries. 
-The GUI make using Whisper easier and once the program is set up, it will be much more user-friendly that the original set up of Whisper.
+The GUI makes using Whisper easier and once the program is set up, it will be much more user-friendly than the original set up of Whisper.
 
 STEP 1:
 Make sure Python (https://www.python.org/) is installed on your computer. It is a good idea to ensure that Python is in you PATH. Generally, speacking the default installation will do this but you should double check. You may have to restart you computer to have it show up in your PATH
 
-  Step 1A: Python in Path
-   In your search bar, type PATH. Open "Edit the System Environment Variables" in the control panel (likely will be the first thing on in the search). Then open "Environment       
-   Variables" (lower right on the system properties-Advanced tab). You will see two sections "User Variables" and "System Variables." Find the variable labled PATH in both section and 
-   make sure that the Python File path is in there. If it is not, find where Python is installed on your computer (C:\Users\COMPUTER_NAME\AppData\Local\Programs\Python) and copy the 
-   file path into both PATH variables 
+  Step 1A: Python in PATH
+   In your search bar, type PATH. Open "Edit the System Environment Variables" in the control panel (likely will be the first thing in the search). Then open "Environment Variables" (lower right on the system properties-Advanced tab). You will see two sections "User Variables" and "System Variables." Find the variable labled PATH in both section and make sure that the Python File path is in there. If it is not, find where Python is installed on your computer (likely C:\Users\COMPUTER_NAME\AppData\Local\Programs\Python) and copy the file path into both PATH variables 
 
 STEP 2: Creat a Virtual Environment
-  When creating a new program, it is a good idea to make a virtual enviornment to run the program. This environment is where all of the libraries and dependencies will be installed. It 
-  keep things seperate from other programs so dependencies are not impacted by other tools. 
-      Dependencies/Libraries: Simply put these are tools that other programers and coders have developed to run sertain things with the code. These help you do a wide variety of things 
-      so you do not have to do all the coding yourself. 
+When creating a new program, it is a good idea to make a virtual enviornment to run the program. This environment is where all of the libraries and dependencies will be installed. It Keep things seperate from other programs so dependencies are not impacted by other tools. 
+      Dependencies/Libraries: Simply put these are tools that other programers and coders have developed to run sertain things with         the code. These help you do a wide variety of things so you do not have to do all the coding yourself. 
       
-  STEP 2A: Set up a virtual environment
+  STEP 2A: Set up a virtual environment (venv)
   
   1) Create a new folder on your C: drive labled "Whipser" (or something like that)
-  2) Right click within that new folder, and "OPEN IN TERMINAL" (You can also open PowerShell and type: cd "C:file\path\to\your\new\folder"). "cd" is the command to open a folder   
+  2) Right click within that new folder, and "OPEN IN TERMINAL" (You can also open PowerShell and type: cd "C:file\path\to\your\new\folder"). "cd" is the command to open a folder directory
        path.
        
          cd "C:file\path\to\your\new\folder"
@@ -33,7 +28,7 @@ STEP 2: Creat a Virtual Environment
      
          python -m venv whisper_venv
           
-  5) Once the venv is created in your directory, you need to activate the venv. This tells opens the venv and will store all of your dependencies within the venv. You will know you        are in the venv when you see the name of your venv in green before your directory file path.
+  5) Once the venv is created in your directory, you need to activate the venv. This opens the venv and will store all of your dependencies within the venv. You will know you are in the venv when you see the name of your venv in green before your directory file path.
        Acttivate your venv:
 
          YOUR_VENV\Scripts\activate
@@ -41,16 +36,19 @@ STEP 2: Creat a Virtual Environment
 
          whisper_venv\Scripts\activate
 STEP 3) 
-Now that your venv is active, you can install Whisper within this venv. NOTE: if you close the terminal you will need to reactivate the venv. Make sure that you have downloaded      the file "requirements.txt" and place it in your directory
+Now that your venv is active, you can install Whisper within this venv. NOTE: if you close the terminal you will need to reactivate the venv. Make sure that you have downloaded the file "requirements.txt" and place it in your directory
       Installing dependencies:
 
     pip install -r requirements.txt
 
   "pip" is the code you will use to install most python libraries and dependencies.
+  
   1) Verify that all the dependencies installed correctly. This list should have all the same things as the requierments.txt
 
          pip list
-  2) Next, verify that Whisper is working properly type:
+  2) Next, verify that Whisper is working properly.
+
+     Type:
 
          whisper
 
@@ -71,6 +69,13 @@ usage: whisper [-h] [--model MODEL] [--model_dir MODEL_DIR] [--device DEVICE] [-
 whisper: error: the following arguments are required: audio
 
 This shows you all of the languages that whisper recognizes and the general terminal script you can run
+
+If you see in RED:
+
+    whisper : The term 'whisper' is not recognized as the name of a cmdlet, function, script file, or operable program.
+    Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+
+Something went wrong and you may need to start over or do some research on the Whisper Github repo.
 
 RUNNING WHISPER:
 1)You can run whisper directly from terminal/PowerShell
@@ -130,5 +135,5 @@ Running a python script through a .bat (or desktop icon)
     :: Pause to keep the window open
     pause
 
-Save the file to your desktop as a LABEL.bat
+Save the file to your desktop as a NAME_THE_FILE.bat
 This will open the Whisper GUI by just clicking on the icon.
