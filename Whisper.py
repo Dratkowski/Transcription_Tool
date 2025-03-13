@@ -39,11 +39,28 @@ def convert_mp4_to_mp3(mp4_file, output_folder):
         messagebox.showerror("Error", f"An error occurred while converting the file: {e}")
         return None
 
+# Function to convert Whisper segments to VTT format
+def segments_to_vtt(segments):
+    vtt_output = "WEBVTT\n\n"
+    for segment in segments:
+        start_time = segment['start']
+        end_time = segment['end']
+        text = segment['text']
+        vtt_output += f"{format_timestamp(start_time)} --> {format_timestamp(end_time)}\n{text}\n\n"
+    return vtt_output
+
+# Function to format timestamp into VTT-compatible format (HH:MM:SS.mmm)
+def format_timestamp(seconds):
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}.{int((seconds - int(seconds)) * 1000):03}"
+
 # Function to run the whisper command
 def transcribe_audio():
     audio_file = audio_file_entry.get()
     model_choice = model_var.get()  # Get the selected model choice from the dropdown
     convert_to_mp3 = convert_mp3_var.get()  # Check if the checkbox is checked
+    format_choice = format_var.get()  # Get the selected format (.vtt or .txt)
 
     if not audio_file:
         messagebox.showerror("Error", "Please select an audio file")
@@ -78,12 +95,20 @@ def transcribe_audio():
 
     try:
         # Perform transcription using the Whisper model object
-        result = model.transcribe(audio_file)
+        result = model.transcribe(audio_file, verbose=True)
 
-        # Save the transcription as a text file
-        output_file = os.path.join(subfolder_path, os.path.basename(audio_file) + ".txt")
-        with open(output_file, 'w') as output:
-            output.write(result['text'])
+        # If the user selected VTT, convert segments to VTT format
+        if format_choice == "VTT":
+            vtt_content = segments_to_vtt(result['segments'])
+            output_file = os.path.join(subfolder_path, os.path.basename(audio_file) + ".vtt")
+            with open(output_file, 'w') as output:
+                output.write(vtt_content)
+
+        # If the user selected TXT, save the basic text transcription
+        elif format_choice == "TXT":
+            output_file = os.path.join(subfolder_path, os.path.basename(audio_file) + ".txt")
+            with open(output_file, 'w') as output:
+                output.write(result['text'])
 
         # Save the mp3 file (if converted)
         if convert_to_mp3 and audio_file.lower().endswith(".mp3"):
@@ -117,6 +142,7 @@ def reset_fields():
     audio_file_entry.delete(0, tk.END)
     model_var.set("medium")
     convert_mp3_var.set(False)  # Reset the checkbox
+    format_var.set("TXT")  # Reset format to TXT
 
 # Create the main window
 root = tk.Tk()
@@ -145,8 +171,16 @@ convert_mp3_var = tk.BooleanVar()
 convert_mp3_checkbox = tk.Checkbutton(root, text="Convert to MP3 (if MP4 file selected)", variable=convert_mp3_var)
 convert_mp3_checkbox.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
 
+# Dropdown to select the transcription format: VTT or TXT
+format_label = tk.Label(root, text="Select Output Format:")
+format_label.grid(row=3, column=0, padx=10, pady=10)
+
+format_var = tk.StringVar(value="TXT")  # Default format is TXT
+format_menu = tk.OptionMenu(root, format_var, "TXT", "VTT")
+format_menu.grid(row=3, column=1, padx=10, pady=10)
+
 transcribe_button = tk.Button(root, text="Transcribe", command=transcribe_audio)
-transcribe_button.grid(row=3, column=0, columnspan=3, pady=20)
+transcribe_button.grid(row=4, column=0, columnspan=3, pady=20)
 
 # Run the Tkinter event loop
 root.mainloop()
