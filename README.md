@@ -86,8 +86,12 @@ RUNNING WHISPER:
 
        whisper audio.flac "C:\LOCATION\OF\YOUR\AUDIO.mp3" audio.wav --model medium
 
-   Note: .mp4 files work the best
-   Note: There are a few different models that you can use to transcribe the audio. These models are AI (Large Language Models-LLMs) models that Whisper uses in the transcription. 
+   Note: .mp4 files work the best but .mp4 can be used. Just check the box:
+        
+        Convert to MP# (if MP$ file selected)
+  This will convert the MP4 to a MP3. The MP3 will be stored in the created file on the desktop.
+  
+Note: There are a few different models that you can use to transcribe the audio. These models are AI (Large Language Models-LLMs) models that Whisper uses in the transcription. 
    Feel free to change the model that best fits your computer.
 
        tiny (requires 1GB RAM)
@@ -97,6 +101,11 @@ RUNNING WHISPER:
        large (requires 10GB RAM)
        turbo (requires 6GB RAM)
    The larger the model the more accurate the transcription will be. Generally, small and medium will work.
+
+Select Output Format:
+This feature is defaulted to a basic .txt. This will transcribe the audio in as one big paragraph. This is generally a faster transcription. 
+
+If VTT is selected, the audio will be transcribed with timestamps. This feature is really good for conversation transcriptions. 
 
 WHISPER GUI
 
