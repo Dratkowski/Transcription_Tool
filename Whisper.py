@@ -4,6 +4,7 @@ from tkinter import messagebox
 import os
 import whisper
 import time
+import ffmpeg
 
 # Function to create directories on the Desktop
 def create_folders():
@@ -28,10 +29,21 @@ def download_model(model_name, model_folder):
     model = whisper.load_model(model_name)  # This will download the model and load it
     return model  # Return the loaded model
 
+# Function to convert mp4 to mp3
+def convert_mp4_to_mp3(mp4_file, output_folder):
+    mp3_file = os.path.join(output_folder, os.path.splitext(os.path.basename(mp4_file))[0] + ".mp3")
+    try:
+        ffmpeg.input(mp4_file).output(mp3_file).run()
+        return mp3_file
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred while converting the file: {e}")
+        return None
+
 # Function to run the whisper command
 def transcribe_audio():
     audio_file = audio_file_entry.get()
     model_choice = model_var.get()  # Get the selected model choice from the dropdown
+    convert_to_mp3 = convert_mp3_var.get()  # Check if the checkbox is checked
 
     if not audio_file:
         messagebox.showerror("Error", "Please select an audio file")
@@ -46,6 +58,12 @@ def transcribe_audio():
 
     # Download and load the selected model from the chosen folder
     model = download_model(model_choice, model_folder)  # Download the selected model
+
+    # If the file is an MP4 and the user wants to convert it
+    if convert_to_mp3 and audio_file.lower().endswith(".mp4"):
+        audio_file = convert_mp4_to_mp3(audio_file, output_folder)
+        if not audio_file:
+            return  # If conversion failed, stop the transcription
 
     # Set the base output directory (where the transcript will be saved)
     subfolder_name = os.path.splitext(os.path.basename(audio_file))[0]
@@ -62,10 +80,15 @@ def transcribe_audio():
         # Perform transcription using the Whisper model object
         result = model.transcribe(audio_file)
 
-        # Write the transcription to a text file (Whisper's default output format)
-        output_file = os.path.join(subfolder_path, f"{os.path.splitext(os.path.basename(audio_file))[0]}.txt")
+        # Save the transcription as a text file
+        output_file = os.path.join(subfolder_path, os.path.basename(audio_file) + ".txt")
         with open(output_file, 'w') as output:
             output.write(result['text'])
+
+        # Save the mp3 file (if converted)
+        if convert_to_mp3 and audio_file.lower().endswith(".mp3"):
+            mp3_output_file = os.path.join(subfolder_path, os.path.basename(audio_file))
+            os.rename(audio_file, mp3_output_file)
 
         # Calculate elapsed time and convert it to minutes
         end_time = time.time()
@@ -84,7 +107,7 @@ def transcribe_audio():
 
 # Function to open a file dialog and select an audio file
 def browse_audio_file():
-    file_path = filedialog.askopenfilename(filetypes=[("Audio Files", "*.flac *.mp3 *.wav")])
+    file_path = filedialog.askopenfilename(filetypes=[("Audio Files", "*.flac *.mp3 *.wav *.mp4")])
     if file_path:
         audio_file_entry.delete(0, tk.END)
         audio_file_entry.insert(0, file_path)
@@ -93,31 +116,37 @@ def browse_audio_file():
 def reset_fields():
     audio_file_entry.delete(0, tk.END)
     model_var.set("medium")
+    convert_mp3_var.set(False)  # Reset the checkbox
 
 # Create the main window
-root = tk.Tk() 
+root = tk.Tk()
 root.title("Whisper Transcription Tool")
 
 # Create the UI elements
 audio_file_label = tk.Label(root, text="Select Audio File:")
-audio_file_label.grid(row=0, column=0, padx=10, pady=10) 
+audio_file_label.grid(row=0, column=0, padx=10, pady=10)
 
-audio_file_entry = tk.Entry(root, width=40) 
-audio_file_entry.grid(row=0, column=1, padx=10, pady=10) 
+audio_file_entry = tk.Entry(root, width=40)
+audio_file_entry.grid(row=0, column=1, padx=10, pady=10)
 
-browse_button = tk.Button(root, text="Browse", command=browse_audio_file) 
-browse_button.grid(row=0, column=2, padx=10, pady=10) 
+browse_button = tk.Button(root, text="Browse", command=browse_audio_file)
+browse_button.grid(row=0, column=2, padx=10, pady=10)
 
 model_label = tk.Label(root, text="Select Model:")
-model_label.grid(row=2, column=0, padx=10, pady=10) 
+model_label.grid(row=1, column=0, padx=10, pady=10)
 
-# Model selection dropdown (small, medium, large) 
-model_var = tk.StringVar(value="medium")  # Default model is "medium" 
-model_menu = tk.OptionMenu(root, model_var, "small", "medium", "large") 
-model_menu.grid(row=2, column=1, padx=10, pady=10) 
+# Model selection dropdown (small, medium, large)
+model_var = tk.StringVar(value="medium")  # Default model is "medium"
+model_menu = tk.OptionMenu(root, model_var, "small", "medium", "large")
+model_menu.grid(row=1, column=1, padx=10, pady=10)
 
-transcribe_button = tk.Button(root, text="Transcribe", command=transcribe_audio) 
-transcribe_button.grid(row=3, column=0, columnspan=3, pady=20) 
+# Checkbox to ask if the user wants to convert mp4 to mp3
+convert_mp3_var = tk.BooleanVar()
+convert_mp3_checkbox = tk.Checkbutton(root, text="Convert to MP3 (if MP4 file selected)", variable=convert_mp3_var)
+convert_mp3_checkbox.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
 
-# Run the Tkinter event loop 
+transcribe_button = tk.Button(root, text="Transcribe", command=transcribe_audio)
+transcribe_button.grid(row=3, column=0, columnspan=3, pady=20)
+
+# Run the Tkinter event loop
 root.mainloop()
